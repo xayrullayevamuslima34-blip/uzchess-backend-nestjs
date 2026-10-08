@@ -1,99 +1,75 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# UzChess Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+REST API for **UzChess**, a chess education platform with online courses and lessons with quizzes, a book library, news, a souvenir shop with a cart, player ratings and match history.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Frontend: [uzchess-frontend-nextjs](https://github.com/xayrullayevamuslima34-blip/uzchess-frontend-nextjs)
 
-## Description
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![TypeORM](https://img.shields.io/badge/TypeORM-FE0803)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Highlights
 
-## Project setup
+- **60+ controllers** across 9 feature modules, each with separate `public/*` and `admin/*` APIs
+- **Auth with OTP verification**, JWT, password hashing with argon2 and role-based guards
+- **Courses:** categories, sections, lessons, lesson questions and user answers, progress tracking, reviews, likes and purchases
+- **Shop:** souvenirs with colors, images, reviews, likes and a cart
+- **Chess:** players and matches
+- **Repository layer** on top of TypeORM, with filter DTOs for pagination and search
+- **File uploads** with Multer, sorted into folders by file type
+- **Env validation** with Joi, so the app fails fast on startup if config is missing
+- **Docker Compose** setup for the API and PostgreSQL
+- **Swagger** docs
 
-```bash
-$ npm install
+## Project structure
+
+```
+src/
+  config/          # TypeORM data source, JWT, Multer, Swagger
+  core/            # decorators, enums, global exception filter, guards, base repositories
+  features/
+    authorization/ # register, login, OTP codes
+    common/        # users, countries, languages, difficulties, terms
+    courses/       # courses, sections, lessons, questions, reviews, purchases
+    library/       # books, authors, categories, reviews, likes
+    news/          # news and views
+    souvenirs/     # souvenirs, colors, images, reviews, likes
+    cart/          # cart items
+    chess/         # players and matches
+    report/        # user reports and report categories
 ```
 
-## Compile and run the project
+Each feature module follows the same layout: `controllers / services / repositories / entities / dtos / filters`.
+
+## Getting started
+
+Requirements: Node.js 20+, PostgreSQL 14+
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+cp .env.example .env   # fill in the values
+npm run generate       # first run only: generate the initial migration from entities
+npm run migrate        # build and apply migrations
+npm run start:dev
 ```
 
-## Run tests
+The API runs at `http://localhost:8008`. Swagger UI is at **http://localhost:8008/docs**.
+
+### With Docker
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env   # set DB_URL host to "db"
+docker compose up --build
 ```
 
-## Deployment
+## API overview
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Prefix | Access | Example |
+|---|---|---|
+| `/auth` | public | sign-up, sign-in, verify / resend OTP, forgot / reset password |
+| `/public/*` | public / user | `GET /public/courses`, `POST /public/cartItems` |
+| `/admin/*` | admin (Bearer token) | `POST /admin/courses`, `PATCH /admin/souvenirs/:id` |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-# uzchess_backend_nest.js
+See Swagger for the full list of endpoints and request/response schemas.
